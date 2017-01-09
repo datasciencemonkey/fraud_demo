@@ -1,0 +1,355 @@
+ <project name="fraud_rules_from_file" pubsub="none" threads="1">
+   <mas-modules>
+     <mas-module language="python" module="test" func-names="execute_fraud_rules">
+       <code><![CDATA[def execute_fraud_rules(order_id,
+                        gender,
+                        title,
+                        given_name,
+                        middle_initial,
+                        surname,
+                        street_address,
+                        city,
+                        state,
+                        zipcode,
+                        country,
+                        country_full,
+                        email_address,
+                        username,
+                        telephone_number,
+                        mothers_maiden,
+                        birthday,
+                        CC_type,
+                        cvv2,
+                        cc_expiration,
+                        national_id,
+                        color,
+                        occupation,
+                        ref_domain,
+                        guid,
+                        latitude,
+                        longitude,
+                        total_session_length,
+                        pageview_pre_purchase_visits,
+                        time_on_cart,
+                        product_view_count,
+                        total_visit_clicks,
+                        customer_credit_selection,
+                        payment_type,
+                        plan_type,
+                        existing_ecom_customer):
+    """Output: order_id,
+                gender,
+                title,
+                given_name,
+                middle_initial,
+                surname,
+                street_address,
+                city,
+                state,
+                zipcode,
+                country,
+                country_full,
+                email_address,
+                username,
+                telephone_number,
+                mothers_maiden,
+                birthday,
+                CC_type,
+                cvv2,
+                cc_expiration,
+                national_id,
+                color,
+                occupation,
+                ref_domain,
+                guid,
+                latitude,
+                longitude,
+                total_session_length,
+                pageview_pre_purchase_visits,
+                time_on_cart,
+                product_view_count,
+                total_visit_clicks,
+                customer_credit_selection,
+                payment_type,
+                plan_type,
+                existing_ecom_customer,
+                total_fraud_score""";
+    total_fraud_score = total_session_length + pageview_pre_purchase_visits
+    return (order_id,
+            gender,
+            title,
+            given_name,
+            middle_initial,
+            surname,
+            street_address,
+            city,
+            state,
+            zipcode,
+            country,
+            country_full,
+            email_address,
+            username,
+            telephone_number,
+            mothers_maiden,
+            birthday,
+            CC_type,
+            cvv2,
+            cc_expiration,
+            national_id,
+            color,
+            occupation,
+            ref_domain,
+            guid,
+            latitude,
+            longitude,
+            total_session_length,
+            pageview_pre_purchase_visits,
+            time_on_cart,
+            product_view_count,
+            total_visit_clicks,
+            customer_credit_selection,
+            payment_type,
+            plan_type,
+            existing_ecom_customer,
+            total_fraud_score)]]></code>
+     </mas-module>
+     <mas-module language="python" module="depl_rules" func-names="execute_fraud_rules">
+       <description>execute_fraud_rules</description>
+       <code><![CDATA[def execute_fraud_rules(order_id,
+                        gender,
+                        title,
+                        given_name,
+                        middle_initial,
+                        surname,
+                        street_address,
+                        city,
+                        state,
+                        zipcode,
+                        country,
+                        country_full,
+                        email_address,
+                        username,
+                        telephone_number,
+                        mothers_maiden,
+                        birthday,
+                        CC_type,
+                        cvv2,
+                        cc_expiration,
+                        national_id,
+                        color,
+                        occupation,
+                        ref_domain,
+                        guid,
+                        latitude,
+                        longitude,
+                        total_session_length,
+                        pageview_pre_purchase_visits,
+                        time_on_cart,
+                        product_view_count,
+                        total_visit_clicks,
+                        customer_credit_selection,
+                        payment_type,
+                        plan_type,
+                        existing_ecom_customer):
+    """Output: order_id,
+                gender,
+                title,
+                given_name,
+                middle_initial,
+                surname,
+                street_address,
+                city,
+                state,
+                zipcode,
+                country,
+                country_full,
+                email_address,
+                username,
+                telephone_number,
+                mothers_maiden,
+                birthday,
+                CC_type,
+                cvv2,
+                cc_expiration,
+                national_id,
+                color,
+                occupation,
+                ref_domain,
+                guid,
+                latitude,
+                longitude,
+                total_session_length,
+                pageview_pre_purchase_visits,
+                time_on_cart,
+                product_view_count,
+                total_visit_clicks,
+                customer_credit_selection,
+                payment_type,
+                plan_type,
+                existing_ecom_customer,
+                total_fraud_score,
+                total_merit_score,
+                outsort_score""";
+
+    total_fraud_score = float(exec_red_light_rules(plan_type,
+                                                   payment_type,
+                                                   time_on_cart,
+                                                   total_visit_clicks))
+
+    total_merit_score = float(exec_green_light_rules(plan_type,
+                                                     payment_type,
+                                                     CC_type))
+    outsort_score = float(calc_outsort_score(total_fraud_score, total_merit_score))
+
+    return (order_id,
+            gender,
+            title,
+            given_name,
+            middle_initial,
+            surname,
+            street_address,
+            city,
+            state,
+            zipcode,
+            country,
+            country_full,
+            email_address,
+            username,
+            telephone_number,
+            mothers_maiden,
+            birthday,
+            CC_type,
+            cvv2,
+            cc_expiration,
+            national_id,
+            color,
+            occupation,
+            ref_domain,
+            guid,
+            latitude,
+            longitude,
+            total_session_length,
+            pageview_pre_purchase_visits,
+            time_on_cart,
+            product_view_count,
+            total_visit_clicks,
+            customer_credit_selection,
+            payment_type,
+            plan_type,
+            existing_ecom_customer,
+            total_fraud_score,
+            total_merit_score,
+            outsort_score)
+
+
+# outsort score computation
+def calc_outsort_score(total_fraud_score, total_merit_score):
+    outsort_score = total_fraud_score - total_merit_score
+    if outsort_score <= 0:
+        outsort_score = 0
+    return outsort_score
+
+
+# red_light rule resolution
+
+def exec_red_light_rules(plan_type, payment_type, time_on_cart, total_visit_clicks):
+    total_fraud_score = 0
+    if plan_type == 'Unlimited' and payment_type in ('24 Month Contract', 'Full Price') and time_on_cart < 10:
+        total_fraud_score += 100
+    if total_visit_clicks < 20:
+        total_fraud_score += 100
+    return total_fraud_score
+
+
+# green light rule resolution
+def exec_green_light_rules(plan_type, payment_type, CC_type):
+    total_merit_score = 0
+    if plan_type.lower() == 'unlimited' and CC_type.lower() == 'mastercard':
+        if payment_type.lower() == '18 month lease':
+            total_merit_score += 100
+    return total_merit_score]]></code>
+     </mas-module>
+     <mas-module language="python" module="apply_fraud_rules" func-names="execute_fraud_rules">
+       <description>file to apply fraud rules</description>
+       <code-file><![CDATA[rules.py]]></code-file>
+     </mas-module>
+   </mas-modules>
+   <contqueries>
+     <contquery name="Continuous_Query_1">
+       <windows>
+         <window-source name="source_data" pubsub="false" collapse-updates="true">
+           <schema>
+             <fields>
+               <field name="datetime" type="stamp" key="true"/>
+               <field name="order_id" type="int64" key="true"/>
+               <field name="gender" type="string"/>
+               <field name="title" type="string"/>
+               <field name="given_name" type="string"/>
+               <field name="middle_initial" type="string"/>
+               <field name="surname" type="string"/>
+               <field name="street_address" type="string"/>
+               <field name="city" type="string"/>
+               <field name="state" type="string"/>
+               <field name="zipcode" type="string"/>
+               <field name="country" type="string"/>
+               <field name="country_full" type="string"/>
+               <field name="email_address" type="string"/>
+               <field name="username" type="string"/>
+               <field name="telephone_number" type="string"/>
+               <field name="mothers_maiden" type="string"/>
+               <field name="birthday" type="string"/>
+               <field name="CC_type" type="string"/>
+               <field name="cvv2" type="string"/>
+               <field name="cc_expiration" type="string"/>
+               <field name="national_id" type="string"/>
+               <field name="color" type="string"/>
+               <field name="occupation" type="string"/>
+               <field name="ref_domain" type="string"/>
+               <field name="guid" type="string"/>
+               <field name="latitude" type="double"/>
+               <field name="longitude" type="double"/>
+               <field name="total_session_length" type="double"/>
+               <field name="pageview_pre_purchase_visits" type="int32"/>
+               <field name="time_on_cart" type="double"/>
+               <field name="product_view_count" type="int32"/>
+               <field name="total_visit_clicks" type="int32"/>
+               <field name="customer_credit_selection" type="string"/>
+               <field name="payment_type" type="string"/>
+               <field name="plan_type" type="string"/>
+               <field name="existing_ecom_customer" type="string"/>
+               <field name="customer_id" type="string"/>
+             </fields>
+           </schema>
+           <connectors>
+             <connector name="New_Connector_1" class="fs">
+               <properties>
+                 <property name="type"><![CDATA[pub]]></property>
+                 <property name="fsname"><![CDATA[fraud_data.csv]]></property>
+                 <property name="fstype"><![CDATA[csv]]></property>
+                 <property name="growinginputfile"><![CDATA[true]]></property>
+               </properties>
+             </connector>
+           </connectors>
+         </window-source>
+         <window-procedural name="Apply_Fraud_Rules_1" collapse-updates="true">
+           <schema>
+             <fields>
+               <field name="datetime" type="stamp" key="true"/>
+               <field name="order_id" type="int64" key="true"/>
+               <field name="customer_id" type="string"/>
+               <field name="total_fraud_score" type="double"/>
+               <field name="total_merit_score" type="double"/>
+               <field name="outsort_score" type="double"/>
+             </fields>
+           </schema>
+           <mas-map>
+             <window-map module="apply_fraud_rules" function="execute_fraud_rules" revision="0" source="source_data"/>
+           </mas-map>
+         </window-procedural>
+       </windows>
+       <edges>
+         <edge source="source_data" target="Apply_Fraud_Rules_1"/>
+       </edges>
+     </contquery>
+   </contqueries>
+ </project>
