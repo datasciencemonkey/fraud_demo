@@ -4,7 +4,6 @@ import sqlite3
 import csv
 import os
 import time, datetime
-# from sklearn.externals.joblib import load
 from pickle import load
 from numpy import array
 
